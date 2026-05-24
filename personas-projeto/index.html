@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personas — Design Thinking</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,600;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0eb;
+    --orange: #e8622a;
+    --orange-dim: #b84d1f;
+    --purple: #7b3fe4;
+    --purple-dim: #5a2db0;
+    --yellow: #f0c040;
+    --gray: #2a2a2a;
+    --gray-light: #3d3d3d;
+    --text-muted: #888;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: var(--black);
+    font-family: 'DM Sans', sans-serif;
+    color: var(--white);
+    overflow: hidden;
+  }
+
+  /* ── SLIDE CONTAINER ── */
+  #deck {
+    width: 100vw; height: 100vh;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 60px 80px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* ── TYPOGRAPHY ── */
+  .display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 12vw, 160px);
+    line-height: 0.9;
+    letter-spacing: 0.02em;
+    color: var(--white);
+  }
+  .display.orange { color: var(--orange); }
+  .display.yellow { color: var(--yellow); }
+
+  .heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(40px, 6vw, 80px);
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  .body {
+    font-family: 'DM Sans', sans-serif;
+    font-size: clamp(16px, 2vw, 24px);
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 720px;
+  }
+
+  .label {
+    font-family: 'DM Mono', monospace;
+    font-size: clamp(11px, 1.2vw, 14px);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .quote {
+    font-family: 'DM Sans', sans-serif;
+    font-style: italic;
+    font-size: clamp(20px, 3vw, 36px);
+    font-weight: 300;
+    line-height: 1.4;
+    max-width: 800px;
+    text-align: center;
+    color: var(--white);
+  }
+
+  /* ── DECORATIVE ── */
+  .accent-line {
+    width: 60px; height: 3px;
+    background: var(--orange);
+    margin: 20px 0;
+  }
+  .accent-line.purple { background: var(--purple); }
+  .accent-line.yellow { background: var(--yellow); }
+
+  .tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border: 1px solid currentColor;
+    border-radius: 2px;
+  }
+  .tag.orange { color: var(--orange); border-color: var(--orange); }
+  .tag.purple { color: var(--purple); border-color: var(--purple); }
+  .tag.yellow { color: var(--yellow); border-color: var(--yellow); }
+
+  /* ── NAV ── */
+  #nav {
+    position: fixed;
+    bottom: 30px; left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    z-index: 100;
+  }
+  .nav-btn {
+    background: none;
+    border: 1px solid #444;
+    color: var(--white);
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+  }
+  .nav-btn:hover { border-color: var(--orange); color: var(--orange); }
+
+  #slide-counter {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    min-width: 60px;
+    text-align: center;
+  }
+
+  /* ── PROGRESS BAR ── */
+  #progress {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--orange);
+    transition: width 0.4s ease;
+    z-index: 100;
+  }
+
+  /* ── BLOCK LABEL TOP LEFT ── */
+  .block-label {
+    position: absolute;
+    top: 30px; left: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  /* ── SLIDE SPECIFIC STYLES ── */
+
+  /* S0 — CAPA */
+  #s0 {
+    background: var(--black);
+    text-align: center;
+  }
+  #s0 .display { font-size: clamp(100px, 18vw, 220px); }
+  #s0 .subtitle {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(16px, 2vw, 22px);
+    color: var(--text-muted);
+    margin-top: 16px;
+    letter-spacing: 0.05em;
+  }
+  .capa-silhouettes {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 200px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 0;
+    opacity: 0.08;
+  }
+  .sil {
+    background: var(--white);
+    border-radius: 50% 50% 0 0 / 60% 60% 0 0;
+    position: relative;
+  }
+  .sil::before {
+    content: '';
+    position: absolute;
+    top: -28px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--white);
+    border-radius: 50%;
+  }
+  .sil-highlight { opacity: 0.6 !important; background: var(--orange) !important; }
+  .sil-highlight::before { background: var(--orange) !important; }
+
+  /* S1 — PARA QUEM */
+  #s1 { background: var(--black); text-align: center; }
+  #s1 .display { font-size: clamp(100px, 16vw, 200px); color: var(--white); }
+  #s1 .display span { color: var(--orange); }
+
+  /* S2 — USUÁRIO ELÁSTICO */
+  #s2 { background: var(--gray); }
+  .elastic-figure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    margin: 30px 0;
+  }
+  .elastic-arrow {
+    font-size: 40px;
+    color: var(--orange);
+    animation: pulse-arrow 1.5s ease-in-out infinite alternate;
+  }
+  .elastic-arrow:first-child { animation-delay: 0s; }
+  .elastic-arrow:last-child { animation-delay: 0.5s; }
+  @keyframes pulse-arrow {
+    from { transform: translateX(0); opacity: 0.4; }
+    to { transform: translateX(8px); opacity: 1; }
+  }
+  .elastic-arrow.left { animation-name: pulse-arrow-left; }
+  @keyframes pulse-arrow-left {
+    from { transform: translateX(0); opacity: 0.4; }
+    to { transform: translateX(-8px); opacity: 1; }
+  }
+  .elastic-person {
+    width: 80px; height: 140px;
+    background: var(--white);
+    border-radius: 40px 40px 20px 20px;
+    position: relative;
+    margin: 0 16px;
+    animation: stretch 1.5s ease-in-out infinite alternate;
+  }
+  .elastic-person::before {
+    content: '';
+    position: absolute;
+    top: -30px; left: 50%;
+    transform: translateX(-50%);
+    width: 44px; height: 44px;
+    background: var(--white);
+    border-radius: 50%;
+  }
+  @keyframes stretch {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(1.5); }
+  }
+
+  /* S3 — DESIGN AUTORREFERENCIAL */
+  #s3 { background: var(--black); }
+  .mirror-container {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+    margin: 30px 0;
+  }
+  .mirror-person {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .person-head {
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: var(--orange);
+  }
+  .person-body {
+    width: 60px; height: 80px;
+    border-radius: 12px 12px 4px 4px;
+    background: var(--orange);
+    opacity: 0.7;
+  }
+  .mirror-glass {
+    width: 4px; height: 140px;
+    background: linear-gradient(to bottom, transparent, var(--white), transparent);
+    position: relative;
+  }
+  .mirror-glass::before {
+    content: 'ESPELHO';
+    position: absolute;
+    top: -24px; left: 50%;
+    transform: translateX(-50%);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .person-head.reflected { background: var(--white); }
+  .person-body.reflected { background: var(--white); opacity: 0.3; }
+
+  /* S4 — ARQUÉTIPO vs ESTEREÓTIPO */
+  #s4 { background: var(--black); }
+  .versus-container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 40px;
+    align-items: center;
+    width: 100%;
+    max-width: 900px;
+  }
+  .versus-side { text-align: center; }
+  .versus-label {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 32px;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+  }
+  .versus-side.bad .versus-label { color: var(--text-muted); }
+  .versus-side.good .versus-label { color: var(--orange); }
+  .versus-dots {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    justify-content: center;
+    max-width: 180px;
+    margin: 0 auto;
+  }
+  .dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+  .dot.connected { background: var(--orange); }
+  .dot-line {
+    width: 100%;
+    height: 1px;
+    background: var(--orange);
+    opacity: 0.3;
+    margin: 4px 0;
+  }
+  .vs-divider {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: #333;
+  }
+
+  /* S5 — DOUBLE DIAMOND */
+  #s5 { background: var(--black); }
+  .diamond-svg { width: 100%; max-width: 700px; }
+
+  /* S6 — O QUE NÃO É */
+  #s6 { background: var(--gray); }
+  .nao-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+    width: 100%;
+    max-width: 860px;
+    margin-top: 30px;
+  }
+  .nao-card {
+    border: 1px solid #3a3a3a;
+    border-radius: 4px;
+    padding: 30px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .nao-card.wrong { opacity: 0.5; }
+  .nao-card.right { border-color: var(--orange); opacity: 1; }
+  .nao-icon { font-size: 40px; margin-bottom: 16px; }
+  .nao-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .nao-desc {
+    font-size: 13px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .nao-card.right .nao-title { color: var(--orange); }
+  .nao-x {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray);
+    padding: 0 6px;
+    font-size: 18px;
+    color: #c0392b;
+  }
+  .nao-check {
+    position: absolute;
+    top: -12px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--gray);
+    padding: 0 6px;
+    font-size: 18px;
+    color: var(--orange);
+  }
+
+  /* S7 — META */
+  #s7 { background: var(--black); text-align: center; }
+  #s7 .quote { font-size: clamp(24px, 4vw, 52px); font-weight: 400; font-style: normal; }
+  #s7 .quote span { color: var(--orange); font-style: italic; }
+
+  /* S8 — ARMADILHAS */
+  #s8 { background: var(--gray); }
+  .trap-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    max-width: 700px;
+    margin-top: 20px;
+  }
+  .trap-item {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding: 20px 24px;
+    border-left: 3px solid var(--orange-dim);
+    background: rgba(255,255,255,0.03);
+  }
+  .trap-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 48px;
+    color: var(--orange-dim);
+    line-height: 1;
+    min-width: 40px;
+  }
+  .trap-text { flex: 1; }
+  .trap-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 0.05em;
+    color: var(--white);
+    margin-bottom: 4px;
+  }
+  .trap-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* S9 — PIRÂMIDE */
+  #s9 { background: var(--black); }
+  .pyramid-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 600px;
+    margin-top: 20px;
+  }
+  .pyramid-level {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    padding: 20px;
+    text-align: center;
+    clip-path: polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%);
+    width: 100%;
+    margin-bottom: 3px;
+  }
+  .pyramid-level:nth-child(1) { background: var(--orange); width: 40%; clip-path: polygon(15% 0%, 85% 0%, 100% 100%, 0% 100%); }
+  .pyramid-level:nth-child(2) { background: var(--orange-dim); width: 70%; }
+  .pyramid-level:nth-child(3) { background: #3a1a0a; width: 100%; border: 1px solid var(--orange-dim); border-top: none; }
+  .pyr-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    color: var(--white);
+  }
+  .pyr-sub {
+    font-size: 12px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
+  }
+  .pyramid-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-align: right;
+    align-self: flex-end;
+    margin-top: 8px;
+  }
+
+  /* S10 — 3 MOVIMENTOS */
+  #s10 { background: var(--gray); }
+  .moves-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 0;
+    width: 100%;
+    max-width: 860px;
+    margin-top: 30px;
+  }
+  .move-step {
+    flex: 1;
+    padding: 30px 24px;
+    position: relative;
+  }
+  .move-step::after {
+    content: '→';
+    position: absolute;
+    right: -14px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 24px;
+    color: var(--orange-dim);
+    z-index: 10;
+  }
+  .move-step:last-child::after { display: none; }
+  .move-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px;
+    color: var(--orange);
+    opacity: 0.2;
+    line-height: 1;
+    margin-bottom: -10px;
+  }
+  .move-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 0.04em;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .move-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* S11 — VARIÁVEIS */
+  #s11 { background: var(--black); }
+  .variables-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    max-width: 700px;
+    margin-top: 20px;
+  }
+  .var-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .var-name {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--orange);
+    min-width: 130px;
+  }
+  .var-bar-bg {
+    flex: 1;
+    height: 6px;
+    background: #222;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+  }
+  .var-bar {
+    height: 100%;
+    background: var(--orange);
+    border-radius: 3px;
+    opacity: 0.7;
+  }
+  .var-dots {
+    display: flex; gap: 8px;
+  }
+  .var-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: #444;
+    position: relative;
+  }
+  .var-dot.active { background: var(--orange); }
+
+  /* S12 — TIPOS */
+  #s12 { background: var(--gray); }
+  .types-grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 20px;
+    width: 100%;
+    max-width: 860px;
+    margin-top: 24px;
+  }
+  .type-card {
+    padding: 28px 22px;
+    border: 1px solid #333;
+    border-radius: 4px;
+  }
+  .type-card.primary { border-color: var(--orange); background: rgba(232,98,42,0.05); }
+  .type-card.secondary { border-color: #444; }
+  .type-card.negative { border-color: #c0392b; background: rgba(192,57,43,0.05); }
+  .type-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .type-card.primary .type-badge { color: var(--orange); }
+  .type-card.secondary .type-badge { color: var(--text-muted); }
+  .type-card.negative .type-badge { color: #c0392b; }
+  .type-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.04em;
+    margin-bottom: 10px;
+  }
+  .type-desc {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* S13 — NUBANK */
+  #s13 {
+    background: #1a0a2e;
+  }
+  #s13::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, rgba(123,63,228,0.3) 0%, transparent 70%);
+  }
+  #s13 .stat {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 10vw, 110px);
+    color: var(--purple);
+    line-height: 0.9;
+  }
+  .nubank-context {
+    text-align: center;
+    position: relative;
+    z-index: 2;
+  }
+  .phone-placeholder {
+    width: 180px; height: 320px;
+    border: 2px solid var(--purple-dim);
+    border-radius: 24px;
+    background: rgba(123,63,228,0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    position: relative;
+  }
+  .phone-placeholder::before {
+    content: '';
+    position: absolute;
+    top: 12px; left: 50%;
+    transform: translateX(-50%);
+    width: 40px; height: 4px;
+    background: var(--purple-dim);
+    border-radius: 2px;
+  }
+  .phone-screen-text {
+    font-size: 12px;
+    color: var(--purple-dim);
+    text-align: center;
+    padding: 20px;
+    line-height: 1.5;
+    font-style: italic;
+  }
+
+  /* S14 — CARLA */
+  #s14 { background: var(--black); }
+  .persona-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 60px;
+    width: 100%;
+    max-width: 900px;
+    align-items: center;
+  }
+  .persona-photo {
+    aspect-ratio: 3/4;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .persona-photo.carla {
+    background: linear-gradient(145deg, #1a1a2e, #2d1a3a);
+    border: 1px solid var(--orange-dim);
+  }
+  .persona-photo-icon {
+    font-size: 80px;
+    opacity: 0.3;
+  }
+  .persona-name-bg {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 20px;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  }
+  .persona-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 36px;
+    letter-spacing: 0.05em;
+    color: var(--orange);
+  }
+  .persona-age {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+  }
+  .persona-goals { display: flex; flex-direction: column; gap: 20px; }
+  .goal-item {}
+  .goal-type {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .goal-type.experience { color: var(--yellow); }
+  .goal-type.end { color: var(--orange); }
+  .goal-type.life { color: var(--text-muted); }
+  .goal-text {
+    font-size: clamp(15px, 2vw, 20px);
+    font-weight: 300;
+    line-height: 1.4;
+    color: var(--white);
+  }
+
+  /* S15 — FELIPE */
+  #s15 { background: var(--black); }
+  .persona-photo.felipe {
+    background: linear-gradient(145deg, #0d1a2e, #1a2d1a);
+    border: 1px solid var(--purple-dim);
+  }
+  #s15 .persona-name { color: var(--purple); }
+  #s15 .goal-type.experience { color: var(--purple); }
+  #s15 .goal-type.end { color: var(--purple-dim); }
+  #s15 .accent-line { background: var(--purple); }
+
+  /* S16 — WIREFRAME */
+  #s16 { background: var(--gray); }
+  .wireframe-phone {
+    width: 280px;
+    border: 2px solid #555;
+    border-radius: 28px;
+    overflow: hidden;
+    background: #111;
+    position: relative;
+  }
+  .wireframe-phone::before {
+    content: '';
+    display: block;
+    width: 50px; height: 5px;
+    background: #333;
+    border-radius: 3px;
+    margin: 14px auto 0;
+  }
+  .wf-section {
+    padding: 20px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .wf-section:last-child { border-bottom: none; }
+  .wf-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 10px;
+    display: inline-block;
+  }
+  .wf-tag.carla { background: rgba(232,98,42,0.2); color: var(--orange); }
+  .wf-tag.felipe { background: rgba(123,63,228,0.2); color: var(--purple); }
+  .wf-line {
+    height: 8px;
+    border-radius: 4px;
+    background: #2a2a2a;
+    margin: 6px 0;
+  }
+  .wf-line.short { width: 60%; }
+  .wf-line.medium { width: 80%; }
+  .wf-line.full { width: 100%; }
+  .wf-btn {
+    height: 36px;
+    border-radius: 4px;
+    background: var(--purple);
+    opacity: 0.6;
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .wf-btn-text {
+    font-size: 10px;
+    font-family: 'DM Mono', monospace;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.1em;
+  }
+
+  /* S17 — DIAMOND TRAVERSAL */
+  #s17 { background: var(--black); }
+
+  /* S18 — FRASE FINAL */
+  #s18 {
+    background: var(--black);
+    text-align: center;
+  }
+  #s18 .big-quote {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 5vw, 64px);
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+    max-width: 820px;
+    color: var(--white);
+  }
+  #s18 .big-quote em { color: var(--orange); font-style: normal; }
+
+  /* S19 — PERGUNTAS */
+  #s19 { background: var(--black); text-align: center; }
+  #s19 .display { font-size: clamp(80px, 14vw, 180px); color: var(--white); }
+  #s19 .display span { color: var(--orange); }
+  .group-names {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-top: 30px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<div id="deck">
+
+  <!-- S0 — CAPA -->
+  <div class="slide active" id="s0">
+    <div style="text-align:center; position:relative; z-index:2;">
+      <div class="label" style="margin-bottom:16px;">Design Thinking</div>
+      <div class="display orange">PERSONAS</div>
+      <div class="subtitle">Quem é o usuário que você imagina?</div>
+    </div>
+    <div class="capa-silhouettes">
+      <div class="sil" style="width:40px;height:120px;"><div style="width:28px;height:28px;background:inherit;border-radius:50%;position:absolute;top:-32px;left:6px;"></div></div>
+      <div class="sil" style="width:50px;height:150px;margin-left:-10px;"><div style="width:34px;height:34px;background:inherit;border-radius:50%;position:absolute;top:-38px;left:8px;"></div></div>
+      <div class="sil sil-highlight" style="width:55px;height:170px;margin-left:-10px;"><div style="width:38px;height:38px;background:var(--orange);border-radius:50%;position:absolute;top:-42px;left:8px;"></div></div>
+      <div class="sil" style="width:48px;height:140px;margin-left:-10px;"><div style="width:32px;height:32px;background:inherit;border-radius:50%;position:absolute;top:-36px;left:8px;"></div></div>
+      <div class="sil" style="width:38px;height:110px;margin-left:-10px;"><div style="width:26px;height:26px;background:inherit;border-radius:50%;position:absolute;top:-30px;left:6px;"></div></div>
+    </div>
+  </div>
+
+  <!-- S1 — PARA QUEM? -->
+  <div class="slide" id="s1">
+    <div class="display">PARA <span>QUEM</span>?</div>
+  </div>
+
+  <!-- S2 — USUÁRIO ELÁSTICO -->
+  <div class="slide" id="s2">
+    <div class="block-label">Bloco 1 — O Problema</div>
+    <div class="heading" style="margin-bottom:8px;">O Usuário Elástico</div>
+    <div class="accent-line"></div>
+    <div class="elastic-figure">
+      <div class="elastic-arrow left">←</div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;">
+        <div style="width:44px;height:44px;background:var(--white);border-radius:50%;animation:stretch 1.5s ease-in-out infinite alternate;"></div>
+        <div class="elastic-person"></div>
+      </div>
+      <div class="elastic-arrow">→</div>
+    </div>
+    <div class="body" style="text-align:center; max-width:560px;">
+      Cada pessoa na sala imagina um usuário diferente.<br>O produto tenta agradar a todos e não satisfaz ninguém.
+    </div>
+    <div class="label" style="margin-top:24px;">Cooper, About Face, 2014</div>
+  </div>
+
+  <!-- S3 — DESIGN AUTORREFERENCIAL -->
+  <div class="slide" id="s3">
+    <div class="block-label">Bloco 1 — O Problema</div>
+    <div class="heading" style="margin-bottom:8px;">Design Autorreferencial</div>
+    <div class="accent-line"></div>
+    <div class="mirror-container">
+      <div class="mirror-person">
+        <div class="person-head"></div>
+        <div class="person-body"></div>
+        <div class="label" style="margin-top:10px;">Desenvolvedor</div>
+      </div>
+      <div class="mirror-glass"></div>
+      <div class="mirror-person">
+        <div class="person-head reflected"></div>
+        <div class="person-body reflected"></div>
+        <div class="label" style="margin-top:10px;">"Usuário"</div>
+      </div>
+    </div>
+    <div class="body" style="text-align:center; max-width:520px;">
+      Projetar para si mesmo significa esquecer que o modelo mental de quem nunca viu o produto é completamente diferente do seu.
+    </div>
+  </div>
+
+  <!-- S4 — ARQUÉTIPO vs ESTEREÓTIPO -->
+  <div class="slide" id="s4">
+    <div class="block-label">Bloco 2 — O Que É</div>
+    <div class="versus-container">
+      <div class="versus-side bad">
+        <div class="versus-label">Estereótipo</div>
+        <div class="versus-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="label" style="margin-top:16px;">Opinião documentada</div>
+      </div>
+      <div class="vs-divider">≠</div>
+      <div class="versus-side good">
+        <div class="versus-label" style="color:var(--orange);">Arquétipo</div>
+        <div class="versus-dots">
+          <div class="dot connected"></div><div class="dot connected"></div><div class="dot"></div>
+          <div class="dot connected"></div><div class="dot connected"></div><div class="dot"></div>
+          <div class="dot"></div><div class="dot connected"></div><div class="dot connected"></div>
+        </div>
+        <div class="label" style="margin-top:16px; color:var(--orange);">Padrão de evidência</div>
+      </div>
+    </div>
+    <div class="accent-line" style="margin-top:40px;"></div>
+    <div class="body" style="text-align:center; margin-top:16px; max-width:620px;">
+      Personas são sínteses de padrões reais observados em pesquisa qualitativa, não preconceitos formatados como perfil.
+    </div>
+  </div>
+
+  <!-- S5 — DOUBLE DIAMOND -->
+  <div class="slide" id="s5">
+    <div class="block-label">Bloco 2 — O Que É</div>
+    <div class="heading" style="margin-bottom:24px; text-align:center;">A Persona no Double Diamond</div>
+    <svg class="diamond-svg" viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- Diamond 1 -->
+      <polygon points="50,110 175,20 300,110 175,200" fill="none" stroke="#3a3a3a" stroke-width="1.5"/>
+      <!-- Diamond 2 -->
+      <polygon points="300,110 425,20 550,110 425,200" fill="none" stroke="#3a3a3a" stroke-width="1.5"/>
+      <!-- Labels -->
+      <text x="80" y="55" font-family="DM Mono" font-size="10" fill="#666" letter-spacing="1">DESCOBERTA</text>
+      <text x="200" y="55" font-family="DM Mono" font-size="10" fill="#666" letter-spacing="1">DEFINIÇÃO</text>
+      <text x="330" y="55" font-family="DM Mono" font-size="10" fill="#666" letter-spacing="1">IDEAÇÃO</text>
+      <text x="440" y="55" font-family="DM Mono" font-size="10" fill="#666" letter-spacing="1">PROTOTIPAGEM</text>
+      <!-- Linha horizontal -->
+      <line x1="50" y1="110" x2="550" y2="110" stroke="#222" stroke-width="1" stroke-dasharray="4,4"/>
+      <!-- Persona marker — dentro do 1º diamante, região da Definição -->
+      <circle cx="237" cy="110" r="18" fill="var(--orange)" opacity="0.15"/>
+      <circle cx="237" cy="110" r="10" fill="var(--orange)"/>
+      <!-- Label persona -->
+      <text x="237" y="150" font-family="Bebas Neue" font-size="14" fill="#e8622a" text-anchor="middle" letter-spacing="2">PERSONA NASCE AQUI</text>
+      <!-- Seta percorrendo o restante do projeto -->
+      <line x1="237" y1="110" x2="540" y2="110" stroke="#e8622a" stroke-width="1.5" stroke-dasharray="6,3" opacity="0.5"/>
+      <polygon points="540,106 550,110 540,114" fill="#e8622a" opacity="0.5"/>
+      <text x="420" y="100" font-family="DM Mono" font-size="9" fill="#e8622a" opacity="0.5" text-anchor="middle" letter-spacing="1">ATRAVESSA O PROJETO</text>
+      <!-- Problem / Solution labels -->
+      <text x="175" y="215" font-family="DM Mono" font-size="10" fill="#555" text-anchor="middle" letter-spacing="1">PROBLEMA</text>
+      <text x="425" y="215" font-family="DM Mono" font-size="10" fill="#555" text-anchor="middle" letter-spacing="1">SOLUÇÃO</text>
+    </svg>
+  </div>
+
+  <!-- S6 — O QUE NÃO É -->
+  <div class="slide" id="s6">
+    <div class="block-label">Bloco 2 — O Que É</div>
+    <div class="heading" style="text-align:center;">Persona não é...</div>
+    <div class="nao-grid">
+      <div class="nao-card wrong">
+        <div class="nao-x">✕</div>
+        <div class="nao-icon">📊</div>
+        <div class="nao-title">Público-alvo</div>
+        <div class="nao-desc">Segmenta por quem compra: idade, renda, canal. Ilumina o processo de venda.</div>
+      </div>
+      <div class="nao-card wrong">
+        <div class="nao-x">✕</div>
+        <div class="nao-icon">📋</div>
+        <div class="nao-title">Perfil demográfico</div>
+        <div class="nao-desc">Foto + nome + dados superficiais. Engaja empatia, mas não guia decisão alguma.</div>
+      </div>
+      <div class="nao-card right">
+        <div class="nao-check">✓</div>
+        <div class="nao-icon" style="color:var(--orange);">🧭</div>
+        <div class="nao-title">Persona</div>
+        <div class="nao-desc">Arquétipo com metas. Segmenta por comportamento, atitude e objetivo. Guia decisão de design.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7 — META -->
+  <div class="slide" id="s7">
+    <div class="label" style="margin-bottom:30px;">Cooper, About Face, 2014</div>
+    <div class="quote">
+      "Se o seu modelo de usuário<br>não tem <span>metas</span>,<br>o que você tem<br>não é uma Persona."
+    </div>
+  </div>
+
+  <!-- S8 — ARMADILHAS -->
+  <div class="slide" id="s8">
+    <div class="block-label">Bloco 3 — Por Que Funciona</div>
+    <div class="heading" style="margin-bottom:24px;">3 Armadilhas que Personas evitam</div>
+    <div class="trap-list">
+      <div class="trap-item">
+        <div class="trap-num">01</div>
+        <div class="trap-text">
+          <div class="trap-name">Usuário Elástico</div>
+          <div class="trap-desc">Cada membro da equipe imagina um usuário diferente. O produto não satisfaz ninguém.</div>
+        </div>
+      </div>
+      <div class="trap-item">
+        <div class="trap-num">02</div>
+        <div class="trap-text">
+          <div class="trap-name">Design Autorreferencial</div>
+          <div class="trap-desc">O desenvolvedor projeta para si mesmo, ignorando que o usuário tem um modelo mental completamente diferente.</div>
+        </div>
+      </div>
+      <div class="trap-item">
+        <div class="trap-num">03</div>
+        <div class="trap-text">
+          <div class="trap-name">Design para Casos Extremos</div>
+          <div class="trap-desc">Funcionalidades para situações raras tornam o produto complexo demais para o uso cotidiano.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S9 — PIRÂMIDE DAS METAS -->
+  <div class="slide" id="s9">
+    <div class="block-label">Bloco 3 — Por Que Funciona</div>
+    <div class="heading" style="text-align:center; margin-bottom:4px;">As 3 Metas de uma Persona</div>
+    <div class="label" style="text-align:center; margin-bottom:24px;">baseado em Cooper + Don Norman</div>
+    <div class="pyramid-container">
+      <div class="pyramid-level" style="background:var(--yellow);opacity:0.9;">
+        <div class="pyr-title" style="color:var(--black);">Experience Goals</div>
+        <div class="pyr-sub" style="color:rgba(0,0,0,0.6);">Como quero me sentir</div>
+      </div>
+      <div class="pyramid-level" style="background:var(--orange);">
+        <div class="pyr-title">End Goals</div>
+        <div class="pyr-sub">O que quero realizar</div>
+      </div>
+      <div class="pyramid-level" style="background:#1a0a00; border:1px solid var(--orange-dim);">
+        <div class="pyr-title" style="color:var(--orange-dim);">Life Goals</div>
+        <div class="pyr-sub" style="color:#666;">Quem quero ser</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S10 — 3 MOVIMENTOS -->
+  <div class="slide" id="s10">
+    <div class="block-label">Bloco 4 — Como Se Constrói</div>
+    <div class="heading" style="text-align:center; margin-bottom:30px;">3 Movimentos</div>
+    <div class="moves-container">
+      <div class="move-step">
+        <div class="move-num">1</div>
+        <div class="move-title">Agrupar por papel + variáveis de comportamento</div>
+        <div class="move-desc">Identifique quem usa o produto, com que frequência, com qual atitude. 15 a 30 variáveis por papel.</div>
+      </div>
+      <div class="move-step">
+        <div class="move-num">2</div>
+        <div class="move-title">Encontrar padrões e sintetizar</div>
+        <div class="move-desc">Mapeie entrevistados nas variáveis. Onde os pontos se agrupam, há uma Persona.</div>
+      </div>
+      <div class="move-step">
+        <div class="move-num">3</div>
+        <div class="move-title">Designar tipo e prioridade</div>
+        <div class="move-desc">Primária, Secundária, Negativa. Cada interface tem apenas uma Persona Primária.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S11 — VARIÁVEIS DE COMPORTAMENTO -->
+  <div class="slide" id="s11">
+    <div class="block-label">Bloco 4 — Como Se Constrói</div>
+    <div class="heading" style="margin-bottom:8px;">Comportamento, não demografia</div>
+    <div class="accent-line"></div>
+    <div class="variables-grid">
+      <div class="var-row">
+        <div class="var-name">Atividades</div>
+        <div class="var-bar-bg"><div class="var-bar" style="width:75%;"></div></div>
+      </div>
+      <div class="var-row">
+        <div class="var-name">Atitudes</div>
+        <div class="var-bar-bg"><div class="var-bar" style="width:40%;"></div></div>
+      </div>
+      <div class="var-row">
+        <div class="var-name">Aptidões</div>
+        <div class="var-bar-bg"><div class="var-bar" style="width:90%;"></div></div>
+      </div>
+      <div class="var-row">
+        <div class="var-name">Motivações</div>
+        <div class="var-bar-bg"><div class="var-bar" style="width:55%;"></div></div>
+      </div>
+      <div class="var-row">
+        <div class="var-name">Habilidades</div>
+        <div class="var-bar-bg"><div class="var-bar" style="width:65%;"></div></div>
+      </div>
+    </div>
+    <div class="body" style="margin-top:30px; color:var(--text-muted); font-size:15px;">
+      Posição relativa entre pessoas importa mais do que a posição exata.<br>
+      <span style="color:var(--orange);">Nunca use médias ou faixas na descrição de uma Persona.</span>
+    </div>
+  </div>
+
+  <!-- S12 — TIPOS DE PERSONA -->
+  <div class="slide" id="s12">
+    <div class="block-label">Bloco 4 — Como Se Constrói</div>
+    <div class="heading" style="text-align:center; margin-bottom:24px;">Tipos de Persona</div>
+    <div class="types-grid">
+      <div class="type-card primary">
+        <div class="type-badge">★ Primária</div>
+        <div class="type-name">Para quem você projeta de verdade</div>
+        <div class="type-desc">Cada interface pode ter apenas uma. Se você satisfizer completamente a Primária, as outras não serão impedidas de usar.</div>
+      </div>
+      <div class="type-card secondary">
+        <div class="type-badge">Secundária</div>
+        <div class="type-name">Acomodada sem prejudicar a Primária</div>
+        <div class="type-desc">Tem necessidades específicas que podem ser atendidas sem comprometer a experiência da Primária.</div>
+      </div>
+      <div class="type-card negative">
+        <div class="type-badge">✕ Negativa</div>
+        <div class="type-name">Para quem o produto não foi feito</div>
+        <div class="type-desc">Existe para impedir que a equipe projete para ela por engano. Não aparece no design, mas define limites.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S13 — NUBANK -->
+  <div class="slide" id="s13">
+    <div class="nubank-context" style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;gap:20px;">
+      <div class="tag purple">Exemplo Real</div>
+      <div class="stat">100M+</div>
+      <div class="body" style="text-align:center; color:rgba(245,240,235,0.7);">clientes. A maior fintech da América Latina.</div>
+      <div class="accent-line purple"></div>
+      <div class="quote" style="font-size:clamp(18px,2.5vw,28px); color:rgba(245,240,235,0.9);">
+        O fluxo de <em style="color:var(--purple);font-style:normal;">pedido de aumento de limite</em>:<br>momento de alta tensão emocional.
+      </div>
+      <div class="phone-placeholder" style="margin-top:10px;">
+        <div class="phone-screen-text">"Não foi possível aumentar seu limite no momento."<br><br>— resposta genérica de quem não usa Personas</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S14 — CARLA -->
+  <div class="slide" id="s14">
+    <div class="block-label">Bloco 5 — Exemplo Real · Persona Primária</div>
+    <div class="persona-layout">
+
+      <!--
+      ╔══════════════════════════════════════════════════════════════╗
+      ║  TROCA DE FOTO — CARLA                                       ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  1. Coloque a imagem na pasta /images (ex: carla.jpg)        ║
+      ║  2. Apague o bloco <div class="persona-photo-icon">          ║
+      ║  3. Adicione dentro de .persona-photo:                       ║
+      ║                                                              ║
+      ║     <img src="images/carla.jpg"                              ║
+      ║          alt="Carla"                                         ║
+      ║          style="width:100%; height:100%;                     ║
+      ║                 object-fit:cover;                            ║
+      ║                 object-position:center top;">                ║
+      ║                                                              ║
+      ║  object-position:center top garante que o rosto              ║
+      ║  apareça mesmo se a imagem for em pé (retrato).              ║
+      ╚══════════════════════════════════════════════════════════════╝
+      -->
+
+      <div class="persona-photo carla">
+        <div class="persona-photo-icon">👩‍💼</div>
+        <div class="persona-name-bg">
+          <div class="persona-name">CARLA</div>
+          <div class="persona-age">29 anos · Analista Financeira</div>
+        </div>
+      </div>
+      <div class="persona-goals">
+        <div class="goal-item">
+          <div class="goal-type experience">Experience Goal</div>
+          <div class="goal-text">Sentir que entende o sistema.<br>Não ser tratada como número.</div>
+        </div>
+        <div class="accent-line" style="width:30px;height:1px;background:#333;margin:0;"></div>
+        <div class="goal-item">
+          <div class="goal-type end">End Goal</div>
+          <div class="goal-text">Saber por que o limite foi negado<br>e o que ela pode fazer a respeito.</div>
+        </div>
+        <div class="accent-line" style="width:30px;height:1px;background:#333;margin:0;"></div>
+        <div class="goal-item">
+          <div class="goal-type life">Life Goal</div>
+          <div class="goal-text">Construir uma vida financeira sólida<br>e ter controle real do próprio dinheiro.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S15 — FELIPE -->
+  <div class="slide" id="s15">
+    <div class="block-label">Bloco 5 — Exemplo Real · Persona Secundária</div>
+    <div class="persona-layout">
+
+      <!--
+      ╔══════════════════════════════════════════════════════════════╗
+      ║  TROCA DE FOTO — FELIPE                                      ║
+      ╠══════════════════════════════════════════════════════════════╣
+      ║  1. Coloque a imagem na pasta /images (ex: felipe.jpg)       ║
+      ║  2. Apague o bloco <div class="persona-photo-icon">          ║
+      ║  3. Adicione dentro de .persona-photo:                       ║
+      ║                                                              ║
+      ║     <img src="images/felipe.jpg"                             ║
+      ║          alt="Felipe"                                        ║
+      ║          style="width:100%; height:100%;                     ║
+      ║                 object-fit:cover;                            ║
+      ║                 object-position:center top;">                ║
+      ║                                                              ║
+      ║  object-position:center top garante que o rosto              ║
+      ║  apareça mesmo se a imagem for em pé (retrato).              ║
+      ╚══════════════════════════════════════════════════════════════╝
+      -->
+
+      <div class="persona-photo felipe">
+        <div class="persona-photo-icon">👨‍💻</div>
+        <div class="persona-name-bg">
+          <div class="persona-name" style="color:var(--purple);">FELIPE</div>
+          <div class="persona-age">24 anos · Freelancer</div>
+        </div>
+      </div>
+      <div class="persona-goals">
+        <div class="goal-item">
+          <div class="goal-type" style="color:var(--purple);">Experience Goal</div>
+          <div class="goal-text">Resolver rápido, sem ler nada.</div>
+        </div>
+        <div class="accent-line" style="width:30px;height:1px;background:#333;margin:0;"></div>
+        <div class="goal-item">
+          <div class="goal-type" style="color:var(--purple-dim);">End Goal</div>
+          <div class="goal-text">Conseguir mais limite agora.<br>Tem uma despesa urgente.</div>
+        </div>
+        <div class="accent-line" style="width:30px;height:1px;background:#333;margin:0;"></div>
+        <div class="goal-item">
+          <div class="goal-type life">Life Goal</div>
+          <div class="goal-text">Flexibilidade financeira para agir<br>sem depender de planejamento prévio.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S16 — SOLUÇÃO: UMA TELA, DUAS PERSONAS -->
+  <div class="slide" id="s16">
+    <div class="block-label">Bloco 5 — Exemplo Real · A Solução</div>
+    <div style="display:flex; align-items:center; gap:60px; width:100%; max-width:860px;">
+      <div style="flex:1;">
+        <div class="heading" style="margin-bottom:16px;">Uma tela.<br>Duas personas.</div>
+        <div class="accent-line"></div>
+        <div class="body" style="margin-top:20px; font-size:18px;">
+          A <span style="color:var(--orange);">Carla</span> queria entender tudo.<br>
+          O <span style="color:var(--purple);">Felipe</span> queria resolver logo.<br><br>
+          A solução não foi criar duas telas separadas, foi criar uma <strong style="color:var(--white);">hierarquia de informação</strong>.
+        </div>
+      </div>
+      <div class="wireframe-phone">
+        <div class="wf-section">
+          <div class="wf-tag carla">Para a Carla</div>
+          <div class="wf-line full"></div>
+          <div class="wf-line medium"></div>
+          <div class="wf-line short"></div>
+          <div style="height:8px;"></div>
+          <div class="wf-line full"></div>
+          <div class="wf-line medium"></div>
+        </div>
+        <div class="wf-section">
+          <div class="wf-tag felipe">Para o Felipe</div>
+          <div class="wf-btn"><div class="wf-btn-text">Limite Garantido →</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- S17 — DIAMOND TRAVERSAL -->
+  <div class="slide" id="s17">
+    <div class="block-label">Bloco 6 — Fechamento</div>
+    <div class="heading" style="text-align:center; margin-bottom:20px;">A Persona atravessa tudo</div>
+    <svg viewBox="0 0 700 240" style="width:100%;max-width:700px;" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="50,120 175,30 300,120 175,210" fill="none" stroke="#3a3a3a" stroke-width="1.5"/>
+      <polygon points="300,120 425,30 550,120 425,210" fill="none" stroke="#3a3a3a" stroke-width="1.5"/>
+      <!-- Persona dot — dentro do 1º diamante, região da Definição -->
+      <circle cx="237" cy="120" r="18" fill="var(--orange)" opacity="0.15"/>
+      <circle cx="237" cy="120" r="10" fill="var(--orange)"/>
+      <!-- Trail percorrendo o restante do projeto -->
+      <line x1="237" y1="120" x2="550" y2="120" stroke="var(--orange)" stroke-width="2" stroke-dasharray="8,4"/>
+      <polygon points="548,116 558,120 548,124" fill="var(--orange)"/>
+      <!-- Decision labels inside diamond 2 -->
+      <text x="380" y="80" font-family="DM Mono" font-size="9" fill="var(--yellow)" text-anchor="middle" letter-spacing="1">'End Goal da Carla?'</text>
+      <text x="470" y="165" font-family="DM Mono" font-size="9" fill="#888" text-anchor="middle" letter-spacing="1">'Life Goal?'</text>
+      <!-- Labels -->
+      <text x="175" y="228" font-family="DM Mono" font-size="10" fill="#555" text-anchor="middle" letter-spacing="1">PROBLEMA</text>
+      <text x="425" y="228" font-family="DM Mono" font-size="10" fill="#555" text-anchor="middle" letter-spacing="1">SOLUÇÃO</text>
+    </svg>
+    <div class="body" style="text-align:center; margin-top:24px; max-width:600px; color:var(--text-muted);">
+      Quando surge um debate, a equipe não vota por opinião.<br>
+      <span style="color:var(--white);">Ela pergunta à Persona.</span>
+    </div>
+  </div>
+
+  <!-- S18 — FRASE FINAL -->
+  <div class="slide" id="s18">
+    <div class="label" style="margin-bottom:30px;">Cooper — About Face, 2014</div>
+    <div class="big-quote">
+      "O mercado está cheio de<br><em>produtos ruins</em><br>esperando por alguém<br>que saiba fazer isso direito."
+    </div>
+  </div>
+
+  <!-- S19 — PERGUNTAS -->
+  <div class="slide" id="s19">
+    <div class="display">PERGUNTAS</span>?</div>
+    <div class="group-names">Caio · Cauã · Diego · Isac · João Artur · João Pedro</div>
+  </div>
+
+</div><!-- /deck -->
+
+<!-- NAV -->
+<div id="nav">
+  <button class="nav-btn" id="btn-prev">← Anterior</button>
+  <span id="slide-counter">1 / 19</span>
+  <button class="nav-btn" id="btn-next">Próximo →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const progress = document.getElementById('progress');
+  const counter = document.getElementById('slide-counter');
+  let current = 0;
+  const total = slides.length;
+
+  function goTo(n) {
+    slides[current].classList.remove('active');
+    current = Math.max(0, Math.min(n, total - 1));
+    slides[current].classList.add('active');
+    counter.textContent = `${current + 1} / ${total}`;
+    progress.style.width = `${((current + 1) / total) * 100}%`;
+  }
+
+  document.getElementById('btn-next').addEventListener('click', () => goTo(current + 1));
+  document.getElementById('btn-prev').addEventListener('click', () => goTo(current - 1));
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') goTo(current + 1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
+  });
+
+  // Initialize
+  progress.style.width = `${(1 / total) * 100}%`;
+</script>
+</body>
+</html>
