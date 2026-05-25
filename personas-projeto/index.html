@@ -864,7 +864,6 @@
 <div id="progress"></div>
 
 <div id="deck">
-
   <!-- S0 — CAPA -->
   <div class="slide active" id="s0">
     <div style="text-align:center; position:relative; z-index:2;">
@@ -879,8 +878,9 @@
       <div class="sil" style="width:48px;height:140px;margin-left:-10px;"><div style="width:32px;height:32px;background:inherit;border-radius:50%;position:absolute;top:-36px;left:8px;"></div></div>
       <div class="sil" style="width:38px;height:110px;margin-left:-10px;"><div style="width:26px;height:26px;background:inherit;border-radius:50%;position:absolute;top:-30px;left:6px;"></div></div>
     </div>
+    <!-- Botão tela cheia — discreto, canto inferior direito do slide -->
+    <button onclick="document.documentElement.requestFullscreen()" style="position:absolute; bottom:80px; right:40px; background:none; border:1px solid #333; color:#555; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; padding:6px 14px; cursor:pointer; transition: color 0.2s, border-color 0.2s; z-index:10;" onmouseover="this.style.color='#e8622a';this.style.borderColor='#e8622a'" onmouseout="this.style.color='#555';this.style.borderColor='#333'">⛶ Tela cheia</button>
   </div>
-
   <!-- S1 — PARA QUEM? -->
   <div class="slide" id="s1">
     <div class="display">PARA <span>QUEM</span>?</div>
@@ -1333,12 +1333,13 @@
     </div>
   </div>
 
-  <!-- S19 — PERGUNTAS -->
+ <!-- S19 — PERGUNTAS -->
   <div class="slide" id="s19">
     <div class="display">PERGUNTAS</span>?</div>
     <div class="group-names">Caio · Cauã · Diego · Isac · João Artur · João Pedro</div>
+    <!-- Botão sair de tela cheia — discreto, canto inferior direito do slide -->
+    <button onclick="document.exitFullscreen()" style="position:absolute; bottom:80px; right:40px; background:none; border:1px solid #333; color:#555; font-family:'DM Mono',monospace; font-size:11px; letter-spacing:0.12em; text-transform:uppercase; padding:6px 14px; cursor:pointer; transition: color 0.2s, border-color 0.2s; z-index:10;" onmouseover="this.style.color='#e8622a';this.style.borderColor='#e8622a'" onmouseout="this.style.color='#555';this.style.borderColor='#333'">✕ Sair de tela cheia</button>
   </div>
-
 </div><!-- /deck -->
 
 <!-- NAV -->
