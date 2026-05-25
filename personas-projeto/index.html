@@ -1378,6 +1378,16 @@
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goTo(current - 1);
   });
 
+  // Scroll do mouse
+  let scrollBloqueado = false;
+  document.addEventListener('wheel', e => {
+    if (scrollBloqueado) return;
+    scrollBloqueado = true;
+    if (e.deltaY < 0) goTo(current + 1);
+    else goTo(current - 1);
+    setTimeout(() => { scrollBloqueado = false; }, 600);
+  });
+
   // Initialize
   progress.style.width = `${(1 / total) * 100}%`;
 </script>
